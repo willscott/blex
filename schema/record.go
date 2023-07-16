@@ -3,6 +3,6 @@ package schema
 type RecordDefinition struct {
 	LexiconPrimaryType
 
-	Key    string
-	Record *ObjectDefinition
+	Key    string            `json:"key"`
+	Record *ObjectDefinition `json:"record,omitempty"`
 }

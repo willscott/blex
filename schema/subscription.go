@@ -3,13 +3,12 @@ package schema
 type SubscriptionDefinition struct {
 	LexiconPrimaryType
 
-	Parameters ParametersDefinition
-	Message    MessageDefinition
-	Errors     []Error
+	Parameters *ParametersDefinition `json:"parameters,omitempty"`
+	Message    MessageDefinition     `json:"message"`
+	Errors     []Error               `json:"errors"`
 }
 
 type MessageDefinition struct {
-	LexiconFieldType
-
-	Schema UnionDefinition
+	Description string          `json:"description,omitempty"`
+	Schema      UnionDefinition `json:"schema"`
 }

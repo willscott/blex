@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -12,6 +14,8 @@ import (
 	"github.com/urfave/cli/v2"
 	"github.com/willscott/blex/schema"
 	"github.com/willscott/blex/schemaparse"
+
+	cjson "github.com/docker/go/canonical/json"
 )
 
 func main() {
@@ -50,11 +54,36 @@ func parseLex(ctx *cli.Context) error {
 			return fmt.Errorf("could not parse %s: %w", source, err)
 		}
 		schemas = append(schemas, schema)
+
+		// ensure schema is fully parsed.
+		parsedJSON, err := json.MarshalIndent(schema, "", "  ")
+		if err != nil {
+			return fmt.Errorf("representation of %s is not serializable: %w", source, err)
+		}
+		originalData, err := os.ReadFile(source)
+		if err == nil {
+			if !bytes.Equal(canonicalRepresentation(parsedJSON), canonicalRepresentation(originalData)) {
+				fmt.Printf("==parsed==\n%s\n==orig==\n%s\n", parsedJSON, originalData)
+				return fmt.Errorf("parse of %s was not complete", source)
+			}
+		}
 	}
 
-	fmt.Printf("accumulated %d schemas\r\n", len(schemas))
+	fmt.Printf("found %d schemas\r\n", len(schemas))
 
 	return nil
+}
+
+func canonicalRepresentation(jsonData []byte) []byte {
+	var repr interface{}
+	if err := json.Unmarshal(jsonData, &repr); err != nil {
+		return nil
+	}
+	out, err := cjson.MarshalCanonical(repr)
+	if err != nil {
+		return nil
+	}
+	return out
 }
 
 func findSchemas(dir string) ([]string, error) {

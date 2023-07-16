@@ -12,6 +12,7 @@ func (dm *DefinitionMap) UnmarshalJSON(data []byte) (err error) {
 	if err != nil {
 		return
 	}
+	*dm = make(DefinitionMap)
 
 	for k, v := range temp {
 		// peek at the type.
@@ -48,6 +49,7 @@ func (fm *FieldMap) UnmarshalJSON(data []byte) (err error) {
 	if err != nil {
 		return
 	}
+	*fm = make(FieldMap)
 
 	for k, v := range temp {
 		// peek at the type.
@@ -103,4 +105,8 @@ func (fd *FieldDefinition) UnmarshalJSON(data []byte) (err error) {
 	}
 
 	return
+}
+
+func (fd *FieldDefinition) MarshalJSON() ([]byte, error) {
+	return json.Marshal(fd.Field)
 }

@@ -3,7 +3,7 @@ module github.com/willscott/blex
 go 1.19
 
 require (
-	github.com/polydawn/refmt v0.89.0
+	github.com/docker/go v1.5.1-1
 	github.com/urfave/cli/v2 v2.25.7
 )
 
